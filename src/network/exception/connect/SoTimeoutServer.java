@@ -10,7 +10,7 @@ public class SoTimeoutServer {
         ServerSocket serverSocket = new ServerSocket(12345);
         Socket socket = serverSocket.accept();
 
-        Thread.sleep(1000000);
+        Thread.sleep(10000);
 
     }
 }
