@@ -1,8 +1,9 @@
-package chat.server.command;
+package chat.server;
 
 import chat.server.CommandManager;
 import chat.server.Session;
 import chat.server.SessionManager;
+import chat.server.command.*;
 
 import java.io.IOException;
 import java.util.HashMap;
