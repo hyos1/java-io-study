@@ -12,34 +12,55 @@ public class Client {
 
     public static void main(String[] args) throws IOException {
         log("클라이언트 시작");
+
         try (Socket socket = new Socket("localhost", PORT);
              DataInputStream input = new DataInputStream(socket.getInputStream());
              DataOutputStream output = new DataOutputStream(socket.getOutputStream())) {
+
             log("소캣 연결: " + socket);
 
+            // 메세지 받는 스레드
+            ReceivedThread receivedThread = new ReceivedThread(input);
+            Thread thread = new Thread(receivedThread);
+            thread.start();
+
             Scanner sc = new Scanner(System.in);
-            System.out.print("이름을 입력하세요: ");
-            String userName = sc.nextLine();
-            output.writeUTF("/join|" + userName);
             while (true) {
-                System.out.print("전송할 문자: ");
+                System.out.print("보낼 메세지: ");
                 String toSend = sc.nextLine();
 
-                // 서버에게 전송
+                // 서버에게 문자 보내기
                 output.writeUTF(toSend);
-                log("client -> server: " + toSend);
-
-                if (toSend.equals("exit")) {
+                log("보낸 메세지: " + toSend);
+//                log("client -> server: " + toSend);
+                if (toSend.equals("/exit")) {
                     break;
                 }
-
-                // 서버로부터 문자 받기
-                String received = input.readUTF();
-                log("client <- server: " + received);
-
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log(e);
+        }
+    }
+
+    static class ReceivedThread implements Runnable {
+
+        private final DataInputStream input;
+
+        public ReceivedThread(DataInputStream input) {
+            this.input = input;
+        }
+
+        @Override
+        public void run() {
+            try {
+                while (true) {
+                    String received = input.readUTF();
+                    System.out.print("\r");
+                    log("📩 " + received);
+                }
+            } catch (IOException e) {
+                log("수신 종료" + e);
+            }
         }
     }
 }

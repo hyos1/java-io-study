@@ -23,9 +23,19 @@ public class SessionManager {
         sessions.clear();
     }
 
-    public synchronized void sendAllUsers(String from, String message) throws IOException {
+    public synchronized void joinUserInfo(Session joinSession, String joinMessage) throws IOException {
         for (Session session : sessions) {
-            session.sendMessage(from, message);
+            if (session != joinSession) {
+                session.joinSession(joinMessage);
+            }
+        }
+    }
+
+    public synchronized void sendAllUsers(Session sendSession, String from, String message) throws IOException {
+        for (Session session : sessions) {
+            if (session != sendSession) {
+                session.sendMessage(from, message);
+            }
         }
     }
 }

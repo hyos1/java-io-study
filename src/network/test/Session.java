@@ -31,27 +31,31 @@ public class Session implements Runnable {
     public void run() {
         try {
             while (true) {
+                // 클라이언트로부터 문자 받기
                 String received = input.readUTF();
-                if (received.equals("/exit")) {
-                    break;
-                }
+                log("client -> server: " + received);
+                String[] split = received.split("\\|", 2);
 
-                String[] part = received.split("\\|", 2);
-                if (part.length < 2) {
-                    output.writeUTF("명령어 형식이 잘못되었습니다.");
+                if (!(split[0].startsWith("/")) || split.length < 2) {
+                    output.writeUTF("잘못된 형식입니다. 다시 입력해주세요");
                     continue;
                 }
-                switch (part[0]) {
-                    case "/join":
-                        name = part[1];
-                        output.writeUTF(name + "님이 입장하셨습니다.");
-                        break;
-                    case "/message":
-                        if (name == null) {
-                            output.writeUTF("[오류] 이름을 등록하세요.");
-                        }
-                        sessionManager.sendAllUsers(name, part[1]);
-                        break;
+                // 접속 종료
+                if (split[0].equals("/exit")) {
+                    if (name != null) {
+                        output.writeUTF(name + "님이 종료하셨습니다.");
+                    }
+                    break;
+                } else if (split[0].equals("/join")) {
+                    name = split[1];
+                    String joinInfo = name + "님이 입장하셨습니다.";
+                    sessionManager.joinUserInfo(this, joinInfo);
+//                    sessionManager.sendAllUsers(this, name, "님이 입장하셨습니다.");
+                } else if (split[0].equals("/message")) {
+                    sessionManager.sendAllUsers(this, name, split[1]);
+//                    output.writeUTF(split[1]);
+                } else if (split[0].equals("/change")) {
+                    name = split[1];
                 }
             }
         } catch (IOException e) {
@@ -72,9 +76,21 @@ public class Session implements Runnable {
         log("연결 종료: " + socket);
     }
 
+    public synchronized void joinSession(String joinMessage) throws IOException {
+//        String joinInfo = name + "님이 입장하셨습니다.";
+        output.writeUTF(joinMessage);
+        log(joinMessage);
+    }
+
     public synchronized void sendMessage(String from, String message) throws IOException {
         String sendMessage = from + ": " + message;
         output.writeUTF(sendMessage);
         log(sendMessage);
+    }
+
+
+
+    public synchronized void exitUser(String from) {
+        System.out.println(from + "님이 나가셨습니다");
     }
 }
