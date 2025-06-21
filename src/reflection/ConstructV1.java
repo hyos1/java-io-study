@@ -1,0 +1,24 @@
+package reflection;
+
+import reflection.data.BasicData;
+
+import java.lang.reflect.Constructor;
+
+public class ConstructV1 {
+
+    public static void main(String[] args) throws ClassNotFoundException {
+        Class<?> aClass = Class.forName("reflection.data.BasicData");
+        System.out.println("aClass = " + aClass);
+
+        System.out.println("===== constructors() ====");
+        Constructor<?>[] constructors = aClass.getConstructors();
+        for (Constructor<?> constructor : constructors) {
+            System.out.println("constructor = " + constructor);
+        }
+
+        Constructor<?>[] declaredConstructors = aClass.getDeclaredConstructors();
+        for (Constructor<?> declaredConstructor : declaredConstructors) {
+            System.out.println("declaredConstructor = " + declaredConstructor);
+        }
+    }
+}
