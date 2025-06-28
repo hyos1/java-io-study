@@ -54,7 +54,7 @@ public class WriteHandler implements Runnable {
     }
 
     private static String inputUsername(Scanner sc) {
-        System.out.print("이름을 입력하세요: ");
+        System.out.println("이름을 입력하세요: ");
         String username;
         do {
             username = sc.nextLine();
